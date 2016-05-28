@@ -1,6 +1,7 @@
 package org.javaopencvbook;
 
 import java.awt.Image;
+import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -48,9 +49,20 @@ public class App {
 		capture.set(Videoio.CAP_PROP_FRAME_WIDTH, 1024);
 		capture.set(Videoio.CAP_PROP_FRAME_HEIGHT, 768);
 		
-		Scalar hsvGreenLower = new Scalar(29, 86, 6);
-		Scalar hsvGreenUpper = new Scalar(64, 255, 255);
+		Scalar hsvRedLower = new Scalar(0, 100, 100);
+		Scalar hsvRedUpper = new Scalar(10, 255, 255);
+		Scalar hsvColorLower = new Scalar(160, 100, 100);
+		Scalar hsvColorUpper = new Scalar(179, 255, 255);
+		Mat loRed = new Mat();
+		Mat hiRed = new Mat();
+		//LinkedList pts = new LinkedList();
 		
+		int erosion_size = 5;
+		int dilation_size = 5;
+		
+		
+		Mat eroElem = new Mat();
+		Mat dilaElem = new Mat();
 		
 		
 		if(capture.isOpened()){
@@ -60,7 +72,14 @@ public class App {
 					//tempImage = imageProcessor.toBufferedImage(webcamMatImage);
 					Imgproc.GaussianBlur(webcamMatImage, filterImage, new Size(11, 11), 0);
 					Imgproc.cvtColor(filterImage, filterImage, Imgproc.COLOR_BGR2HSV);
-					Core.inRange(filterImage, hsvGreenLower, hsvGreenUpper, filterImage);
+					Core.inRange(filterImage, hsvRedLower, hsvRedUpper, loRed);
+					Core.inRange(filterImage, hsvColorLower, hsvColorUpper, hiRed);
+					Core.add(loRed, hiRed, filterImage);
+					
+					eroElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2*erosion_size + 1, 2*erosion_size + 1));
+					Imgproc.erode(filterImage, filterImage, eroElem);
+					dilaElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2*dilation_size + 1, 2*dilation_size + 1));
+					Imgproc.dilate(filterImage, filterImage, dilaElem);
 					
 					tempImage = imageProcessor.toBufferedImage(filterImage);
 					ImageIcon imageIcon = new ImageIcon(tempImage, "Captured video");
