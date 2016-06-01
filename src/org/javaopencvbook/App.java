@@ -1,7 +1,6 @@
 package org.javaopencvbook;
 
 import java.awt.Image;
-import java.util.LinkedList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -40,7 +39,7 @@ public class App {
 		frame.setVisible(true);
 	}
 
-	public void runMainLoop(String[] args){
+	public void runMainLoop(String[] args) {
 		ImageProcessor imageProcessor = new ImageProcessor();
 		Mat webcamMatImage = new Mat();
 		Mat filterImage = new Mat();
@@ -48,51 +47,52 @@ public class App {
 		VideoCapture capture = new VideoCapture(0);
 		capture.set(Videoio.CAP_PROP_FRAME_WIDTH, 1024);
 		capture.set(Videoio.CAP_PROP_FRAME_HEIGHT, 768);
-		
+
 		Scalar hsvRedLower = new Scalar(0, 100, 100);
 		Scalar hsvRedUpper = new Scalar(10, 255, 255);
 		Scalar hsvColorLower = new Scalar(160, 100, 100);
 		Scalar hsvColorUpper = new Scalar(179, 255, 255);
 		Mat loRed = new Mat();
 		Mat hiRed = new Mat();
-		//LinkedList pts = new LinkedList();
-		
+		// LinkedList pts = new LinkedList();
+
 		int erosion_size = 5;
 		int dilation_size = 5;
-		
-		
+
 		Mat eroElem = new Mat();
 		Mat dilaElem = new Mat();
-		
-		
-		if(capture.isOpened()){
-			while(true){
+
+		if (capture.isOpened()) {
+			while (true) {
 				capture.read(webcamMatImage);
-				if(!webcamMatImage.empty()){
-					//tempImage = imageProcessor.toBufferedImage(webcamMatImage);
+				if (!webcamMatImage.empty()) {
+					// tempImage =
+					// imageProcessor.toBufferedImage(webcamMatImage);
 					Imgproc.GaussianBlur(webcamMatImage, filterImage, new Size(11, 11), 0);
 					Imgproc.cvtColor(filterImage, filterImage, Imgproc.COLOR_BGR2HSV);
 					Core.inRange(filterImage, hsvRedLower, hsvRedUpper, loRed);
 					Core.inRange(filterImage, hsvColorLower, hsvColorUpper, hiRed);
 					Core.add(loRed, hiRed, filterImage);
-					
-					eroElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2*erosion_size + 1, 2*erosion_size + 1));
+
+					eroElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,
+							new Size(2 * erosion_size + 1, 2 * erosion_size + 1));
 					Imgproc.erode(filterImage, filterImage, eroElem);
-					dilaElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2*dilation_size + 1, 2*dilation_size + 1));
+					dilaElem = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,
+							new Size(2 * dilation_size + 1, 2 * dilation_size + 1));
 					Imgproc.dilate(filterImage, filterImage, dilaElem);
-					
+
 					tempImage = imageProcessor.toBufferedImage(filterImage);
 					ImageIcon imageIcon = new ImageIcon(tempImage, "Captured video");
 					imageLabel.setIcon(imageIcon);
 					frame.pack();
-				}else {
+				} else {
 					System.out.println(" -- Frame not captured -- Break!");
 					break;
 				}
 			}
-		}else {
+		} else {
 			System.out.println("Couldn't open capture");
 		}
-		
+
 	}
 }
