@@ -1,4 +1,4 @@
-package org.javaopencvbook;
+
 
 import java.awt.Image;
 
@@ -6,7 +6,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.javaopencvbook.utils.ImageProcessor;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;

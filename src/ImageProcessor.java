@@ -1,4 +1,4 @@
-package org.javaopencvbook.utils;
+
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
